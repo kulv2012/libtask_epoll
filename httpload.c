@@ -36,15 +36,15 @@ void fetchtask(void *v) {
 	
 	fprintf(stderr, "starting...\n");
 	for(;;){
-		if((fd = netdial(TCP, server, 80)) < 0){//异步连接服务器，会造成协程切换
+		if((fd = netdial(TCP, server, 8001)) < 0){//异步连接服务器，会造成协程切换
 			fprintf(stderr, "dial %s: %s (%s)\n", server, strerror(errno), taskgetstate());
 			continue;
 		}
 		snprintf(buf, sizeof buf, "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n", url, server);
-		fdwrite(fd, buf, strlen(buf));//异步数据读写，这里可能会造成协程切换，因为一定有阻塞操作
-		while((n = fdread(fd, buf, sizeof buf)) > 0){///异步读取
-			//buf[n] = '\0';
-			//printf("buf:%s", buf);
+		fdwrite(&fd, buf, strlen(buf));//异步数据读写，这里可能会造成协程切换，因为一定有阻塞操作
+		while((n = fdread(&fd, buf, sizeof buf)) > 0){///异步读取
+			buf[n] = '\0';
+			printf("buf:%s", buf);
 		}
 		close(fd);
 		write(1, ".", 1);

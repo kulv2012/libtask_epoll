@@ -152,10 +152,10 @@ int		chansendul(Channel *c, unsigned long v);
 /*
  * Threaded I/O.
  */
-int		fdread(int, void*, int);
-int		fdread1(int, void*, int);	/* always uses fdwait */
-int		fdwrite(int, void*, int);
-void		fdwait(int, int);
+int		fdread(int* , void*, int);
+int		fdread1(int* , void*, int);	/* always uses fdwait */
+int		fdwrite(int* , void*, int);
+void		fdwait(int*, int);
 int		fdnoblock(int);
 
 void		fdtask(void*);
@@ -170,7 +170,7 @@ enum
 };
 
 int		netannounce(int, char*, int);
-int		netaccept(int, char*, int*);
+int		netaccept(int*, char*, int*);
 int		netdial(int, char*, int);
 int		netlookup(char*, uint32_t*);	/* blocks entire program! */
 int		netdial(int, char*, int);

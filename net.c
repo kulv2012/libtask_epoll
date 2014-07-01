@@ -52,18 +52,18 @@ netannounce(int istcp, char *server, int port)
 }
 
 int
-netaccept(int fd, char *server, int *port)
+netaccept(int* pfd, char *server, int *port)
 {
 	int cfd, one;
 	struct sockaddr_in sa;
 	uchar *ip;
 	socklen_t len;
 	
-	fdwait(fd, 'r');//等待可读事件触发，否则调度别人运行
+	fdwait(pfd, 'r');//等待可读事件触发，否则调度别人运行
 
 	taskstate("netaccept");
 	len = sizeof sa;
-	if((cfd = accept(fd, (void*)&sa, &len)) < 0){
+	if((cfd = accept( 0x3FFFFFFF&*pfd, (void*)&sa, &len)) < 0){
 		taskstate("accept failed");
 		return -1;
 	}
@@ -183,7 +183,7 @@ netdial(int istcp, char *server, int port)
 	}
 
 	/* wait for finish */	
-	fdwait(fd, 'w');//等待处理完成，并且会释放CPU的。
+	fdwait(&fd, 'w');//等待处理完成，并且会释放CPU的。
 	sn = sizeof sa;
 	if(getpeername(fd, (struct sockaddr*)&sa, &sn) >= 0){
 		taskstate("connect succeeded");

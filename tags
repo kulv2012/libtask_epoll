@@ -149,20 +149,22 @@ delaytask	testdelay.c	/^delaytask(void *v)$/;"	f
 deltask	task.c	/^deltask(Tasklist *l, Task *t)$/;"	f
 elemsize	task.h	/^	unsigned int	elemsize;$/;"	m	struct:Channel
 emalloc	primes.c	/^emalloc(unsigned long n)$/;"	f
+epoll_recv_events	fd.c	/^static struct epoll_event epoll_recv_events[MAXFD] ;$/;"	v	typeref:struct:epoll_event	file:
 exiting	taskimpl.h	/^	int	exiting;$/;"	m	struct:Task
 f1	test/context.c	/^static void f1 (void) { $/;"	f	file:
 f2	test/context.c	/^static void f2 (void) { $/;"	f	file:
 fdnoblock	fd.c	/^fdnoblock(int fd)$/;"	f
-fdread	fd.c	/^fdread(int fd, void *buf, int n)$/;"	f
-fdread1	fd.c	/^fdread1(int fd, void *buf, int n)$/;"	f
+fdread	fd.c	/^fdread(int* pfd, void *buf, int n)$/;"	f
+fdread1	fd.c	/^fdread1(int* pfd, void *buf, int n)$/;"	f
 fdtask	fd.c	/^fdtask(void *v)$/;"	f
-fdwait	fd.c	/^fdwait(int fd, int rw)$/;"	f
-fdwrite	fd.c	/^fdwrite(int fd, void *buf, int n)$/;"	f
+fdwait	fd.c	/^fdwait(int *fd, int rw)$/;"	f
+fdwrite	fd.c	/^fdwrite(int* pfd, void *buf, int n)$/;"	f
 fetchtask	httpload.c	/^void fetchtask(void *v) {$/;"	f
 fprint	print.c	/^fprint(int fd, char *fmt, ...)$/;"	f
 fprint	taskimpl.h	63;"	d
 func1	test/swapcontext.c	/^func1(void)$/;"	f	file:
 func2	test/swapcontext.c	/^func2(void)$/;"	f	file:
+g_epollfd	fd.c	/^static int g_epollfd ;$/;"	v	file:
 getcontext	386-ucontext.h	2;"	d
 getcontext	amd64-ucontext.h	2;"	d
 getcontext	power-ucontext.h	2;"	d
@@ -270,7 +272,6 @@ netdial	net.c	/^netdial(int istcp, char *server, int port)$/;"	f
 netlookup	net.c	/^netlookup(char *name, uint32_t *ip)$/;"	f
 next	taskimpl.h	/^	Task	*next;\/\/协程的双向链表$/;"	m	struct:Task
 nil	taskimpl.h	45;"	d
-npollfd	fd.c	/^static int npollfd;$/;"	v	file:
 nsec	fd.c	/^nsec(void)$/;"	f	file:
 off	task.h	/^	unsigned int	off;$/;"	m	struct:Channel
 op	task.h	/^	unsigned int	op;$/;"	m	struct:Alt
@@ -278,9 +279,8 @@ otherop	channel.c	56;"	d	file:
 owner	task.h	/^	Task	*owner;$/;"	m	struct:QLock
 parseip	net.c	/^parseip(char *name, uint32_t *ip)$/;"	f	file:
 pc	power-ucontext.h	/^	ulong	pc;		\/* lr *\/$/;"	m	struct:mcontext
-pollfd	fd.c	/^static struct pollfd pollfd[MAXFD];\/\/局部静态的poll数组$/;"	v	typeref:struct:pollfd	file:
-polltask	fd.c	/^static Task *polltask[MAXFD];$/;"	v	file:
 port	tcpproxy.c	/^int port;$/;"	v
+prepare_fdtask	fd.c	/^void prepare_fdtask(){$/;"	f
 prev	taskimpl.h	/^	Task	*prev;$/;"	m	struct:Task
 primetask	primes.c	/^primetask(void *arg)$/;"	f
 print	print.c	/^print(char *fmt, ...)$/;"	f

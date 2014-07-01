@@ -50,7 +50,7 @@ taskmain(int argc, char **argv)
 		taskexitall(1);
 	}
 	fdnoblock(fd);
-	while((cfd = netaccept(fd, remote, &rport)) >= 0){
+	while((cfd = netaccept(&fd, remote, &rport)) >= 0){
 		fprintf(stderr, "connection from %s:%d\n", remote, rport);
 		taskcreate(proxytask, (void*)cfd, STACK);
 	}
@@ -84,8 +84,8 @@ rwtask(void *v)
 	wfd = a[1];
 	free(a);
 	
-	while((n = fdread(rfd, buf, sizeof buf)) > 0)
-		fdwrite(wfd, buf, n);
+	while((n = fdread(&rfd, buf, sizeof buf)) > 0)
+		fdwrite(&wfd, buf, n);
 	shutdown(wfd, SHUT_WR);
 	close(rfd);
 }
