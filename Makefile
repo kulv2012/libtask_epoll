@@ -13,7 +13,7 @@ OFILES=\
 	rendez.o\
 	task.o\
 
-all: $(LIB) primes tcpproxy testdelay httpload testdelay1
+all: $(LIB) primes tcpproxy testdelay httpload testdelay1 tcplongconnection tcplongclient
 
 $(OFILES): taskimpl.h task.h 386-ucontext.h power-ucontext.h
 
@@ -45,8 +45,14 @@ testdelay: testdelay.o $(LIB)
 testdelay1: testdelay1.o $(LIB)
 	$(CC) -o testdelay1 testdelay1.o $(LIB)
 
+tcplongconnection: tcplongconnection.o $(LIB)
+	$(CC) -o tcplongconnection tcplongconnection.o $(LIB)
+
+tcplongclient: tcplongclient.o $(LIB)
+	$(CC) -o tcplongclient tcplongclient.o $(LIB)
+
 clean:
-	rm -f *.o primes tcpproxy testdelay testdelay1 httpload $(LIB)
+	rm -f *.o primes tcpproxy testdelay testdelay1 httpload tcplongconnection tcplongclient $(LIB)
 
 install: $(LIB)
 	cp $(LIB) /usr/local/lib

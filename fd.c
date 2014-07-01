@@ -60,13 +60,14 @@ fdtask(void *v)
 				ms = 5000;
 		}
 		int retval = epoll_wait( g_epollfd, epoll_recv_events, MAXFD, ms) ;
-		if( retval > 0){
+		if( retval >= 0){
 			for( i=0; i < retval; i++){
 				taskready( epoll_recv_events[i].data.ptr) ;//变为可执行状态
 			}
 		} else if( retval == EINTR){
 			continue ;
-		} else{
+		} else if (retval < 0){
+			fprint(2, "epoll: %s\n", strerror(errno));
 			taskexitall(0);
 		}
 
