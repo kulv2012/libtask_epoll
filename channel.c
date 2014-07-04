@@ -15,7 +15,7 @@ chancreate(int elemsize, int bufsize)
 	memset(c, 0, sizeof *c);
 	c->elemsize = elemsize;
 	c->bufsize = bufsize;
-	c->nbuf = 0;
+	c->nbuf = 0;//当前存了多少个
 	c->buf = (uchar*)(c+1);
 	return c;
 }
@@ -53,11 +53,12 @@ delarray(Altarray *a, int i)
  * doesn't really work for things other than CHANSND and CHANRCV
  * but is only used as arg to chanarray, which can handle it
  */
+//算一下当前这个op上面还缺少的OP
 #define otherop(op)	(CHANSND+CHANRCV-(op))
 
 static Altarray*
 chanarray(Channel *c, uint op)
-{
+{//得到指定OP的数组
 	switch(op){
 	default:
 		return nil;
@@ -77,16 +78,17 @@ altcanexec(Alt *a)
 	if(a->op == CHANNOP)
 		return 0;
 	c = a->c;
-	if(c->bufsize == 0){
-		ar = chanarray(c, otherop(a->op));
-		return ar && ar->n;
+	if(c->bufsize == 0){//整形数的时候，为0
+		ar = chanarray(c, otherop(a->op));//为啥要用otherop,其实就是去掉设置的OP，用没有设置的那个
+		//比如我这是发送, 那么这里得到的ar等于&c->arecv 接收数组
+		return ar && ar->n;//数组不为空，并且还有元素
 	}else{
 		switch(a->op){
 		default:
 			return 0;
-		case CHANSND:
+		case CHANSND://如果还有空间可以存，那么久返回可以执行
 			return c->nbuf < c->bufsize;
-		case CHANRCV:
+		case CHANRCV://想读，并且内存里面还有，那么返回可以执行
 			return c->nbuf > 0;
 		}
 	}
@@ -209,7 +211,7 @@ altexec(Alt *a)
 	c = a->c;
 	ar = chanarray(c, otherop(a->op));
 	if(ar && ar->n){
-		i = rand()%ar->n;
+		i = rand()%ar->n;//又随机取一个位置
 		other = ar->a[i];
 		altcopy(a, other);
 		altalldequeue(other->xalt);
@@ -230,22 +232,19 @@ chanalt(Alt *a)
 	needstack(512);
 	for(i=0; a[i].op != CHANEND && a[i].op != CHANNOBLK; i++)
 		;
-	n = i;
-	canblock = a[i].op == CHANEND;
+	n = i;//前面有这么多个元素
+	canblock = a[i].op == CHANEND;//可以阻塞?
 
 	t = taskrunning;
 	for(i=0; i<n; i++){
-		a[i].task = t;
+		a[i].task = t;//指向发送的协程
 		a[i].xalt = a;
 	}
-if(dbgalt) print("alt ");
+
 	ncan = 0;
-	for(i=0; i<n; i++){
-		c = a[i].c;
-if(dbgalt) print(" %c:", "esrnb"[a[i].op]);
-if(dbgalt) { if(c->name) print("%s", c->name); else print("%p", c); }
-		if(altcanexec(&a[i])){
-if(dbgalt) print("*");
+	for(i=0; i<n; i++){//遍历每一个消息
+		c = a[i].c;//所指的协程
+		if(altcanexec(&a[i])){//查看该操作是否可以执行
 			ncan++;
 		}
 	}
@@ -253,20 +252,13 @@ if(dbgalt) print("*");
 		j = rand()%ncan;
 		for(i=0; i<n; i++){
 			if(altcanexec(&a[i])){
-				if(j-- == 0){
-if(dbgalt){
-c = a[i].c;
-print(" => %c:", "esrnb"[a[i].op]);
-if(c->name) print("%s", c->name); else print("%p", c);
-print("\n");
-}
+				if(j-- == 0){//随机找一个位置,从后往前放
 					altexec(&a[i]);
 					return i;
 				}
 			}
 		}
 	}
-if(dbgalt)print("\n");
 
 	if(!canblock)
 		return -1;
@@ -291,9 +283,9 @@ _chanop(Channel *c, int op, void *p, int canblock)
 	Alt a[2];
 
 	a[0].c = c;
-	a[0].op = op;
+	a[0].op = op;//放一个操作指令在这
 	a[0].v = p;
-	a[1].op = canblock ? CHANEND : CHANNOBLK;
+	a[1].op = canblock ? CHANEND : CHANNOBLK;//结束
 	if(chanalt(a) < 0)
 		return -1;
 	return 1;

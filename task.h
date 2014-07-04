@@ -97,9 +97,9 @@ typedef struct Channel Channel;
 
 enum
 {
-	CHANEND,
-	CHANSND,
-	CHANRCV,
+	CHANEND,//结束
+	CHANSND,//发送
+	CHANRCV,//接收
 	CHANNOP,
 	CHANNOBLK,
 };
@@ -109,8 +109,8 @@ struct Alt
 	Channel		*c;
 	void		*v;
 	unsigned int	op;
-	Task		*task;
-	Alt		*xalt;
+	Task		*task;//设置我的协程是哪一个
+	Alt		*xalt;//我属于哪个Alt 数组
 };
 
 struct Altarray
@@ -125,7 +125,7 @@ struct Channel
 	unsigned int	bufsize;
 	unsigned int	elemsize;
 	unsigned char	*buf;
-	unsigned int	nbuf;
+	unsigned int	nbuf;//当前的buf数目，最多elemsize
 	unsigned int	off;
 	Altarray	asend;
 	Altarray	arecv;
