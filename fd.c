@@ -137,8 +137,8 @@ fdwait(int *fd, int rw)
 	}
 	taskstate("fdwait for %s", rw=='r' ? "read" : rw=='w' ? "write" : "error");
 
-	oldmask |= (0x80000000&*fd) != 0 ? EPOLLIN : 0 ;
-	oldmask |= (0x40000000&*fd) != 0 ? EPOLLOUT : 0 ;
+	oldmask |= (0x80000000&*fd) != 0 ? EPOLLIN : 0 ;//最高位用来表示我已经epoll_ctl注册了可读事件
+	oldmask |= (0x40000000&*fd) != 0 ? EPOLLOUT : 0 ;//次高位用来记录是否注册了可写事件
 	addedmask = 0;
 	switch(rw){
 	case 'r':
@@ -163,7 +163,7 @@ fdwait(int *fd, int rw)
 	}
 	taskswitch();//注意这里并没有修改这个协程的运行状态，这样他下次还可能跑起来
 
-	if( (addedmask | oldmask) != oldmask  ){ //说明刚才我增加过，那么这里需要从当前状态中，去掉刚刚加入的。 这里如果另外的协程加入了新的事件，就会出现.
+	if( (addedmask | oldmask) != oldmask  ){ //说明刚才我增加过，那么这里需要从当前状态中，去掉刚刚加入的。 这里如果另外的协程加入了新的事件，就会出现这种情况.
 		//最好是代码确认读取完成后，显示删除
 		oldmask |= (0x80000000&*fd) != 0 ? EPOLLIN : 0 ;
 		oldmask |= (0x40000000&*fd) != 0 ? EPOLLOUT : 0 ;
